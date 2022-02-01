@@ -12,6 +12,8 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 
 
 //Ticket routes
+Route::get('/contact', [ContactController::class, 'getContact'])
+    ->middleware([])->name("getContact");
 Route::post('/contact', [ContactController::class, 'contact'])
     ->middleware([])->name("postContact");
 Route::get('/tickets', [ContactController::class, 'getAllTickets'])

@@ -29,6 +29,10 @@ class ContactController extends Controller
         ]);
     }
 
+    public function getContact() {
+        return view("contact");
+    }
+
     public function getAllTickets() {
         $allTickets = receivedContact::all();
         return view("tickets")->with('tickets', $allTickets);
