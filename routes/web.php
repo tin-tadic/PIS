@@ -6,26 +6,22 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ArticleController;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes(['reset' => false]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
 //Ticket routes
 Route::post('/contact', [ContactController::class, 'contact'])
     ->middleware([])->name("postContact");
 Route::get('/tickets', [ContactController::class, 'getAllTickets'])
-    ->middleware(['auth', 'isAdmin'])->name("getAllTickets");
+    ->middleware(['auth'])->name("getAllTickets");
 Route::post('/tickets/{id}/process', [ContactController::class, 'setTicketSolved'])
-    ->middleware(['auth', 'isAdmin'])->name("postSetTicketSolved");
+    ->middleware(['auth'])->name("postSetTicketSolved");
 Route::post('/tickets/{id}/trash', [ContactController::class, 'setTicketTrashed'])
-    ->middleware(['auth', 'isAdmin'])->name("postSetTicketTrashed");
+    ->middleware(['auth'])->name("postSetTicketTrashed");
 Route::get('/ticket/{id}', [ContactController::class, 'getTicketInfo'])
-    ->middleware(['auth', 'isAdmin'])->name("getGetTicketInfo");
+    ->middleware(['auth'])->name("getGetTicketInfo");
 
 //Profile routes
 Route::get('/profile/{id}', [ProfileController::class, 'display'])
@@ -50,6 +46,7 @@ Route::post('/unadminUser/{id}', [ProfileController::class, 'unadminUser'])
 Route::get('/getArticles', [ArticleController::class, 'getArticles']);
 Route::post('/addArticle', [ArticleController::class, 'addArticle']);
 Route::get('/viewArticle/{id}', [ArticleController::class, 'viewArticle']);
+Route::get('/editArticle/{id}', [ArticleController::class, 'getEditArticle']);
 Route::post('/editArticle/{id}', [ArticleController::class, 'editArticle']);
 Route::get('/isSubscribed/{id}', [ArticleController::class, 'isSubscribed']);
 Route::post('/subscribe/{id}', [ArticleController::class, 'subscribe']);
