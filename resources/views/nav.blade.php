@@ -1,20 +1,49 @@
 <nav class="navbar is-fixed-top is-dark" role="navigation" aria-label="main navigation">
     <div class="navbar-menu">
         <div class="navbar-start">
-            <a href="index.html" class="navbar-item has-background-success">Naslovna</a>
-            <a href="contact.html" class="navbar-item has-background-success">Kontakt</a>
-            <a href="tickets.html" class="navbar-item has-background-success">Tiketi</a>
-        </div>
+         <div class="navbar-item">
+                <div class="buttons">
+                    @auth
+                        <a class="button is-light" href="{{ route("home") }}">Naslovna</a>
+                        <a class="button is-light" href="{{ route("getContact") }}">Kontakt</a>
+
+                        @if (auth()->user() && auth()->user()->role >= 1)
+                            <a class="button is-light" href="{{ route("getAllTickets") }}">Tiketi</a>
+                        @endif
+
+                        {{-- @if (auth()->user() && auth()->user()->role >= 2)
+                            <a class="button is-light" href="{{ route("allUsers") }}">Korisnici</a>
+                        @endif --}}
+                    @endauth
+
+                </div>
+            </div>
+
+
+         </div>
 
         <div class="navbar-end">
             <div class="navbar-item">
                 <div class="buttons">
-                    <a href="profile.html" class="button is-light"> Profil </a>
-                    <a href="register.html" class="button is-info"> <strong> Registracija </strong> </a>
-                    <a href="login.html" class="button is-success">Log in</a>
-                    <a class="button is-success">Logout</a>
+                    @guest
+                    @if (Route::has('login'))
+                            <a class="button is-success" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            <a class="button is-info" href="{{ route('register') }}">{{ __('Registracija') }}</a>
+                    @endif
+                    @else
+                        <a class="button is-info" href="{{ route('getGetProfile', auth()->user()->id) }}">Profil</a>
+
+                        <a class="button is-danger" href="{{ route('logout') }}"
+                                onclick="event.preventDefault();
+                                                document.getElementById('logout-form').submit();">
+                                {{ __('Logout') }}
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    @endguest
                 </div>
-        </div>
+            </div>
 
     </div>
 </nav>

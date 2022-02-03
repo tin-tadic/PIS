@@ -5,104 +5,146 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Validator;
+use Response;
 
 class ProfileController extends Controller
 {
     //Function that fetches the profile of the currently viewed user profile
     public function display($id) {
         if ( DB::table('users')->where('id', $id)->exists() ) {
-            $profile = DB::table('users')->where('id', $id)->get();
-            dd($profile);
-            return view("profile")->with('profile', $profile);
-        } else {
-            dd("Not found");
-        }
-    }
-
-    //Function that gets the list of subscribed articles for the currently viewed user profile
-    public function getSubscribedArticles($id) {
-        if ( DB::table('subscriptions')->where('subscribed_user', $id)->exists() ) {
+            $profile = DB::table('users')->where('id', $id)->first();
+                
             $subscribedArticles = DB::table('subscriptions')
                 ->where('subscribed_user', $id)
                 ->join('articles', 'articles.id', '=', 'subscribed_article')
                 ->get();
-            return $subscribedArticles;
+            
+            foreach($subscribedArticles as $subscribedArticle) {
+                if (DB::table('subscriptions')->where('subscribed_article',  $subscribedArticle->id)->exists()) {
+                    $subscribedArticle->title = DB::table('articles')->where('id',  $subscribedArticle->id)->value('title');
+                }
+            }
+
+            $coupons = DB::table('coupons')->where('ownedByUser', $id)->get();
+
+            return view("profile")->with(['profile' => $profile,'subscribedArticles' => $subscribedArticles , 'coupons' => $coupons]);
         } else {
-            return 0;
+            return view("not-found");
         }
     }
 
-    //Function to save changes to a user's profile
+    public function getEdit($id) {
+        if ( DB::table('users')->where('id', $id)->exists() ) {
+            $profile = DB::table('users')->where('id', $id)->first();
+            return view("profile-edit")->with('profile', $profile);
+        } else {
+            return view("not-found");
+        }
+    }
+
+
     public function saveEdit(Request $request, $id){
-        //First we have check the email of the user we are editing
-        //If the submitted data's email is the same as the already existing one, we cannot validate it with the "unique" rule as it already exists
         $currentUserMail = DB::table('users')->where('id', $id)->value('email');
 
-        if($currentUserMail != $request->email){
-            $request->validate([
+        if ($currentUserMail != $request->email){
+            $rules = [
                 'email' => ['required', 'email', 'unique:users'],
-                'age' => ['min:0', 'max:120'],
-                'message' => ['max: 1023'],
-            ]);
+                'age' => ['min:1', 'max:120'],
+                'location' => ['min:2, max: 50']
+            ];
+            $messages = [
+                'email.required' => 'Email je obavezan',
+                'email.email' => 'Email je neispravan',
+                'email.unique' => 'Email je već u uporabi.',
+
+                'age.min' => 'Neispravna dob.',
+                'age.max' => 'Neispravna dob.',
+
+                'location.min' => 'Lokacija mora sadržavati minimalno 2 znaka.',
+                'location.max' => 'Lokacija mora sadržavati maksimalno 2 znaka.',
+            ];
+            $validator = Validator::make($request->all(), $rules, $messages);
+    
+            if ($validator->fails()) {
+                return redirect()->back()->withInput()->withErrors($validator);
+            }
+            
             DB::table('users')->where('id', $id)->update([
                 'email' => $request->email,
                 'age' => $request->age,
                 'gender' => $request->gender,
                 'location' => $request->location,
-                'message' => $request->message,
             ]);
+
         } else {
-            //If it is not different, then we do not verify it as unique since it already will be unique and we do not change it
-            $request->validate([
-                'email' => ['required', 'email'],
-                'age' => ['min:0', 'max:120'],
-                'message' => ['max: 1023'],
-            ]);
+            $rules = [
+                'age' => ['min:1', 'max:120'],
+                'location' => ['min:2, max: 50']
+            ];
+            $messages = [
+                'age.min' => 'Neispravna dob.',
+                'age.max' => 'Neispravna dob.',
+
+                'location.min' => 'Lokacija mora sadržavati minimalno 2 znaka.',
+                'location.max' => 'Lokacija mora sadržavati maksimalno 2 znaka.',
+            ];
+    
+            $validator = Validator::make($request->all(), $rules, $messages);
+    
+            if ($validator->fails()) {
+                return redirect()->back()->withInput()->withErrors($validator);
+            }
             DB::table('users')->where('id', $id)->update([
                 'age' => $request->age,
                 'gender' => $request->gender,
                 'location' => $request->location,
-                'message' => $request->message,
             ]);
         }
-    }
 
-    //Function to save the user's avatar
-    public function uploadAvatar(Request $request, $id) {
-        $name = $request->photo->getClientOriginalName();
-
-        //If the user has no avatar we just insert it
-        if (DB::table('users')->where('id', $id)->value('avatar') == null) {
-            DB::table('users')->where('id', $id)->update(['avatar' => $name]);
-            $request->photo->storeAs('images', $name, 'public');
-        } else {
-            //If the user already has an avatar we delete the old one...
-            $old_name = DB::table('users')->where('id', $id)->value('avatar');
-            Storage::delete('/public/images/'.$old_name);
-            //...and only then we insert the new one. This is to delete unused images and conserve space
-            DB::table('users')->where('id', $id)->update(['avatar' => $name]);
-            $request->photo->storeAs('images', $name, 'public');
+        // If there is an image change, upload the new one and delete the old one if it exists
+        if($request->avatar) {
+            if (DB::table('users')->where('id', $id)->value('avatar') != NULL) {
+                $oldAvatar = DB::table('users')->where('id', $id)->value('avatar');
+                Storage::delete('/public/profilePictures/' . $oldAvatar);
+            }
+            $name = auth()->user()->id . '-' . Str::random(15) . '-' . $request->avatar->getClientOriginalName();
+            $request->avatar->storeAs('profilePictures', $name, 'public');
+            DB::table('users')->where('id', $id)->update([
+                'avatar' => $name,
+            ]);
         }
+
+        return redirect()->route("getGetProfile", $id);
     }
     
     //Function that bans the selected user
     public function banUser($id) {
         DB::table('users')->where('id', $id)->update(['isBanned' => 1]);
+        return redirect()->back();
     }
     //Function that unbans the selected user
     public function unbanUser($id) {
         DB::table('users')->where('id', $id)->update(['isBanned' => 0]);
+        return redirect()->back();
     }
     //Function that makes the selected user an admin
     public function adminUser($id) {
         DB::table('users')->where('id', $id)->update(['role' => 1]);
+        return redirect()->back();
     }
     //Function that un-makes the selected user an admin
     public function unadminUser($id) {
         DB::table('users')->where('id', $id)->update(['role' => 0]);
+        return redirect()->back();
     }
 
-    
-
+    public function removeCoupon($id) {
+        if(DB::table('coupons')->where('coupon_id', $id)->exists()) {
+            DB::table('coupons')->where('coupon_id', $id)->delete();
+        }
+        return redirect()->back();
+    }
 
 }

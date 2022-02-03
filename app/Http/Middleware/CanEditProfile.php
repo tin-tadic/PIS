@@ -16,10 +16,10 @@ class CanEditProfile
      */
     public function handle(Request $request, Closure $next)
     {
-        if( (auth()->user()->id == $request->route('userId')) || auth()->user()->role == 2) {
+        if( (auth()->user()->id == $request->route('id')) || auth()->user()->role >= 1) {
             return $next($request);
         } else {
-            return redirect()->route('home')->with('error', 'Radnja nije dozvoljena! Kontaktirajte administratora.');
+            return redirect()->route('home');
         }
     }
 }

@@ -1,61 +1,85 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-</head>
-<body>
+@extends('layouts.app')
 
+@section('pageTitle', 'Katalog')
+
+@section('content')
+<div>
+<br/>
+<br/>
+<br/>
+<br/>
     <div class="columns">
         <div class="column is-one-fifth">
           <aside class="menu has-background-light">
             <div class="card">
 
                 <div class="card-image has-text-centered px-6">
-                  <img src="img/profile.png" alt="Placeholder image">
+                  @if($profile->avatar)
+                    <img src="/storage/profilePictures/{{ $profile->avatar }}" alt="avatar_image"/>
+                  @else
+                    <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Placeholder image">
+                  @endif
                 </div>
 
                 <div class="card-content">
-                  <p class="title is-size-5 has-text-centered">Jozo Jozić</p>
-                  <p class="has-background-light">Email: <span id="email"></span></p>
-                  <p class="has-background-light">Dob: <span id="dob"></span></p>
-                  <p class="has-background-light">Spol: <span id="spol"></span></p>
-                  <p class="has-background-light">Prebivalište: <span id="prebivaliste"></span></p>
+                  <p class="title is-size-5 has-text-centered">{{ $profile->name }}</p>
+                  <p class="has-background-light">Email: {{ $profile->email }}<span id="email"></span></p>
+                  <p class="has-background-light">Dob: {{ $profile->age }}<span id="dob"></span></p>
+                  <p class="has-background-light">Spol: {{ $profile->gender }}<span id="spol"></span></p>
+                  <p class="has-background-light">Prebivalište: {{ $profile->location }}<span id="prebivaliste"></span></p>
                 </div>
 
+                @if ( (auth()->user()->id == $profile->id) || (auth()->user()->role == 2 || auth()->user()->role > $profile->role) )
                 <div class="field">
                     <p class="control">
-                      <button class="button is-success is-fullwidth">
-                        Edit
-                      </button>
+                      <a href="{{ route("getEditProfile", $profile->id) }}">
+                        <button class="button is-success is-fullwidth">
+                          Edit
+                        </button>
+                      </a>
                     </p>
                   </div>
+                @endif
 
+                  @if (auth()->user()->role >= 1 && $profile->role == 0)
                   <div class="field">
                     <p class="control">
-                      <button class="button is-danger is-fullwidth mb-1">
-                        Ban
-                      </button>
-                      <button class="button is-warning is-fullwidth mb-1">
-                        Unban
-                      </button>
+                      @if (!$profile->isBanned)
+                        <a href="{{ route('postBanUser', $profile->id) }}">
+                          <button class="button is-danger is-fullwidth mb-1">
+                            Ban
+                          </button>
+                        </a>
+                      @else
+                        <a href="{{ route('postUnbanUser', $profile->id) }}">
+                          <button class="button is-warning is-fullwidth mb-1">
+                            Unban
+                          </button>
+                        </a>
+                      @endif
                     </p>
                   </div>
+                  @endif
 
-                  <div class="field">
-                    <p class="control">
-                      <button class="button is-info is-fullwidth mb-1">
-                        Make Admin
-                      </button>
-                      <button class="button is-info is-fullwidth mb-1">
-                        Unmake Admin
-                      </button>
-                    </p>
-                  </div>
-
+                  @if (auth()->user()->role >= 2 && auth()->user()->id != $profile->id)
+                    <div class="field">
+                      <p class="control">
+                        @if ($profile->role == 0)
+                        <a href="{{ route('postAdminUser', $profile->id) }}">
+                          <button class="button is-info is-fullwidth mb-1">
+                            Make Admin
+                          </button>
+                        </a>
+                        @else
+                        <a href="{{ route('postUnadminUser', $profile->id) }}">
+                          <button class="button is-info is-fullwidth mb-1">
+                            Unmake Admin
+                          </button>
+                        </a>
+                        @endif
+                      </p>
+                    </div>
+                  @endif
             </div>
           </aside>
         </div>
@@ -75,69 +99,53 @@
                 </div>
                 <div class="px-2" id="tab-content">
                   <div id="product-details">
-                    <h3 class="is-size-5 title">Preplaćeni artikli</h3>
-                    <div class="field has-background-dark">
-                        <p class="has-icons-right">
-                            <span class="is-pulled-left">
-                                Artikal:
-                                <a class="mr-5">Mrkve</a>
-                                In stock:
-                                <a class="mr-5">Da</a>
-                                Status kupona: Primjenjen
-                            </span>
-                          
-                            <span class="icon is-small is-right is-pulled-right">
-                              <i class="fas fa-trash mr-1"></i>
-                           </p>
-                  </div>
-  
-                  <br/>
-                  <br/>
-                  <div class="field has-background-dark">
-                    <p class="has-icons-right">
-                      <span class="is-pulled-left">
-                          Artikal:
-                          <a class="mr-5">Krumpir</a>
-                          In stock:
-                          <a class="mr-5">Ne</a>
-                          Status kupona: Nije Primjenjen
-                      </span>
-                    
-                      <span class="icon is-small is-right is-pulled-right">
-                        <i class="fas fa-trash mr-1"></i>
-                     </p>
-                </div>
-                <br/>
+                    <h3 class="is-size-5 title">Zapraćeni artikli</h3>
+                    @foreach($subscribedArticles as $subscribedArticle)
+                      <div class="field has-background-dark">
+                          <p class="has-icons-right">
+                              <span class="is-pulled-left">
+                                  Artikal:
+                                  <a class="mr-5">{{ $subscribedArticle->title }}</a>
+                              </span>
+                            
+                              @if(auth()->user()->id == $profile->id)
+                                <a href="{{ route("unsubscribe", $subscribedArticle->id) }}">
+                                  <span class="icon is-small is-right is-pulled-right">
+                                    <i class="fas fa-trash mr-1"></i>
+                                </a>
+                              @endif
+                            </p>
+                      </div>
+                     <br/>
+                      <br/>
+                    @endforeach
+                    <br/>
   
                   </div>
                   <div id="delivery-information" class="is-hidden">
                     <h3 class="is-size-5 title">Kuponi</h3>
-                    <div class="field has-background-dark">
-                      <p class="has-icons-right">
-                        <span class="is-pulled-left">
-                            Kupon:
-                            <a class="mr-5">10%</a>
-                            In stock:
-                            <a class="">1</a>
-                        </span>
-                       </p>
-                  </div>
-  
-                  <br/>
-                  <br/>
-                  <div class="field has-background-dark">
-                    <p class="has-icons-right">
-                      <span class="is-pulled-left">
-                          Kupon:
-                          <a class="mr-5">15%</a>
-                          In stock:
-                          <a class="">0</a>
-                      </span>
-                     </p>
-                </div>
+                    @foreach($coupons as $coupon)
+                      <div class="field has-background-dark">
+                        <p class="has-icons-right">
+                          <span class="is-pulled-left">
+                              ID kupona:
+                              <a class="mr-5">{{ $coupon->coupon_id }}</a>
+                              Popust:
+                              <a class="">{{ $coupon->discount_amount }}%</a>
+                            </span>
+                              @if(auth()->user()->role >= 1)
+                              <a href="{{ route("removeCoupon", $coupon->coupon_id) }}">
+                                <span class="icon is-small is-right is-pulled-right">
+                                  <i class="fas fa-trash mr-1"></i>
+                              </a>
+                            @endif
 
-                <br/>
-  
+                        </p>
+                    </div>
+                    <br/>
+                    <br/>
+                  @endforeach 
+                  <br/>
                   </div>
                 </div>
               </div>
@@ -145,10 +153,7 @@
         </div>
      </div>
 
-
-    
-</body>
-</html>
+</div>
 
 <style>
     .section{

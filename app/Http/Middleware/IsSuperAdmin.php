@@ -16,10 +16,10 @@ class IsSuperAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        if(auth()->user()->role == 2) {
+        if(auth()->user()->role >= 2) {
             return $next($request);
         } else {
-            return redirect()->route('home')->with('error', 'Radnja nije dozvoljena! Kontaktirajte administratora.');
+            return redirect()->route('home');
         }
     }
 }

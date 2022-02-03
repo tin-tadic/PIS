@@ -1,24 +1,29 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uredi Artikl</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-</head>
-<body>
+@extends('layouts.app')
+
+@section('pageTitle', 'Katalog')
+
+@section('content')
+<div>
+<br/>
+<br/>
+<br/>
+
     
-    <section class="hero is-dark is-fullheight">
+    <section class="hero is-light is-fullheight">
         <div class="hero-body">
             <div class="container">
                 <div class="columns is-centered">
                     <div class="column is-half">
-                        <form class ="box">
+                        <form class="box" action="/editArticle/{{ $article->id }}" method="POST" enctype="multipart/form-data">
+                          @csrf
 
                             <div class="field">
                                 <figure class="image is-3by2 is-centered">
-                                    <img src="img/mrkva.jpg">
+                                  @if($article->picture)
+                                    <img src="/storage/articlePictures/{{ $article->picture }}" alt="article_image"/>
+                                  @else
+                                    <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Placeholder image">
+                                  @endif
                                 </figure>
                             </div>
 
@@ -27,7 +32,7 @@
                                 <div class="field">
                                     <div class="file has-name">
                                         <label class="file-label">
-                                          <input class="file-input" type="file" name="resume">
+                                          <input class="file-input" type="file" name="picture">
                                           <span class="file-cta">
                                             <span class="file-icon">
                                               <i class="fas fa-upload"></i>
@@ -36,61 +41,55 @@
                                               Choose a file…
                                             </span>
                                           </span>
-                                          <span class="file-name">
-                                            Primjer.png
-                                          </span>
                                         </label>
                                       </div>
                                   </div>
                             </div>
+                            @if ($errors->has('picture'))
+                              <p class="">{{ $errors->first('picture') }}</p>
+                          @endif
 
                             <div class="field ">
                               <label for="" class="label">Naziv</label>
-                              <input class="input" type="text" value="Mrkva">
+                              <input class="input" type="text" placeholder="Unesite ime artikla" name="title" value="{{ $article->title }}">
+                                @if ($errors->has('title'))
+                                  <p class="">{{ $errors->first('title') }}</p>
+                                @endif
                             </div>
 
                             <div class="field ">
-
                                 <label for="" class="label">Cijena</label>
-                                <input class="input" type=“number” value="2KM">
+                                <input class="input" type="number" placeholder="Unesite cijenu" name="price" value="{{ $article->price }}">
+                                @if ($errors->has('price'))
+                                  <p class="">{{ $errors->first('price') }}</p>
+                                @endif
                             </div>
 
 
                             <div class="field ">
                                 <label for="" class="label">Kratki opis</label>
-                                <input class="input" type="text" placeholder="Unesite Kratki Opis">
+                                <input class="input" type="text" placeholder="Unesite  kratki opis" name="description" value="{{ $article->title }}">
+                                @if ($errors->has('description'))
+                                  <p class="">{{ $errors->first('description') }}</p>
+                                @endif
                             </div>
-
-                            <div class="field">
-                              <div class="control">
-                                  <label class="label">Da li je artikl in stock?</label>
-                                  
-                                  <label class="radio">
-                                    <input type="radio" name="foobar">
-                                    In Stock
-                                  </label>
-                                  <label class="radio">
-                                    <input type="radio" name="foobar" checked>
-                                    Out of Stock
-                                  </label>
-                                </div>
-                          </div>
 
                             <div class="field ">
                                 <label for="" class="label">Detaljni opis:</label>
                                 <div class="control">
-                                    <textarea class="textarea" placeholder="Unesite Detaljni opis"></textarea>
+                                    <textarea class="textarea" placeholder="Unesite detaljni opis" name="more_info">{{ $article->more_info }}</textarea>
+                                    @if ($errors->has('more_info'))
+                                      <p class="">{{ $errors->first('more_info') }}</p>
+                                    @endif
                                   </div>
                             </div>
 
                             <div class="field">
                                 <p class="control">
-                                  <button class="button is-success ">
-                                    Spremi
-                                  </button>
-                                  <button class="button is-danger is-pulled-right">
-                                    Poništi
-                                  </button>
+                                  <input class="button is-primary" type="submit" value="Spremi promjene" />
+                                  <a href="{{ route("home") }}" class="button is-danger is-pulled-right">
+                                      Na naslovnu
+                                  </a>
                                   
                                 </p>
                               </div>
@@ -103,5 +102,5 @@
         </div>
     </section>
 
-</body>
-</html>
+</div>
+

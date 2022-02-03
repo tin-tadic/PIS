@@ -13,44 +13,51 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 
 //Ticket routes
 Route::get('/contact', [ContactController::class, 'getContact'])
-    ->middleware([])->name("getContact");
+    ->middleware(['auth'])->name("getContact");
 Route::post('/contact', [ContactController::class, 'contact'])
-    ->middleware([])->name("postContact");
+    ->middleware(['auth'])->name("postContact");
 Route::get('/tickets', [ContactController::class, 'getAllTickets'])
-    ->middleware(['auth'])->name("getAllTickets");
-Route::post('/tickets/{id}/process', [ContactController::class, 'setTicketSolved'])
-    ->middleware(['auth'])->name("postSetTicketSolved");
-Route::post('/tickets/{id}/trash', [ContactController::class, 'setTicketTrashed'])
-    ->middleware(['auth'])->name("postSetTicketTrashed");
+    ->middleware(['auth', 'isAdmin'])->name("getAllTickets");
+Route::get('/tickets/{id}/process', [ContactController::class, 'setTicketSolved'])
+    ->middleware(['auth', 'isAdmin'])->name("postSetTicketSolved");
+Route::get('/tickets/{id}/trash', [ContactController::class, 'setTicketTrashed'])
+    ->middleware(['auth', 'isAdmin'])->name("postSetTicketTrashed");
 Route::get('/ticket/{id}', [ContactController::class, 'getTicketInfo'])
-    ->middleware(['auth'])->name("getGetTicketInfo");
+    ->middleware(['auth', 'isAdmin'])->name("getGetTicketInfo");
 
 //Profile routes
+Route::get("/editProfile/{id}", [ProfileController::class, 'getEdit'])
+    ->middleware(['auth', 'canEditProfile'])->name("getEditProfile");
 Route::get('/profile/{id}', [ProfileController::class, 'display'])
     ->middleware(['auth'])->name("getGetProfile");
-Route::post('/profile/{id}', [ProfileController::class, 'saveEdit'])
+Route::post('/editProfile/{id}', [ProfileController::class, 'saveEdit'])
     ->middleware(['auth', 'canEditProfile'])->name("postSaveEditProfile");
-Route::post('/uploadAvatar/{id}', [ProfileController::class, 'uploadAvatar'])
-    ->middleware(['auth', 'canEditProfile'])->name("postUploadAvatar");
-Route::get('/subscribedArticles/{id}', [ProfileController::class, 'getSubscribedArticles'])
-    ->middleware([])->name("getGetSubscribedArticles");
 //Admin routes
-Route::post('/banUser/{id}', [ProfileController::class, 'banUser'])
+Route::get('/banUser/{id}', [ProfileController::class, 'banUser'])
     ->middleware(['auth', 'isAdmin'])->name("postBanUser");
-Route::post('/unbanUser/{id}', [ProfileController::class, 'unbanUser'])
+Route::get('/unbanUser/{id}', [ProfileController::class, 'unbanUser'])
     ->middleware(['auth', 'isAdmin'])->name("postUnbanUser");
-Route::post('/adminUser/{id}', [ProfileController::class, 'adminUser'])
+Route::get('/adminUser/{id}', [ProfileController::class, 'adminUser'])
     ->middleware(['auth', 'isSuperAdmin'])->name("postAdminUser");
-Route::post('/unadminUser/{id}', [ProfileController::class, 'unadminUser'])
+Route::get('/unadminUser/{id}', [ProfileController::class, 'unadminUser'])
     ->middleware(['auth', 'isSuperAdmin'])->name("postUnadminUser");
+Route::get("/removeCoupon/{id}", [ProfileController::class, 'removeCoupon'])
+    ->middleware('auth', 'isAdmin')->name("removeCoupon");
 
 //Main page (article) routes
-Route::get('/getArticles', [ArticleController::class, 'getArticles']);
-Route::post('/addArticle', [ArticleController::class, 'addArticle']);
-Route::get('/viewArticle/{id}', [ArticleController::class, 'viewArticle']);
-Route::get('/editArticle/{id}', [ArticleController::class, 'getEditArticle']);
-Route::post('/editArticle/{id}', [ArticleController::class, 'editArticle']);
-Route::get('/isSubscribed/{id}', [ArticleController::class, 'isSubscribed']);
-Route::post('/subscribe/{id}', [ArticleController::class, 'subscribe']);
-Route::post('/unsubscribe/{id}', [ArticleController::class, '@unsubscribe']);
-Route::post('/deleteArticle/{id}', [ArticleController::class, 'deleteArticle']);
+Route::get('/addArticle', [ArticleController::class, 'getAddArticle'])
+    ->middleware(['auth', 'isAdmin'])->name("getAddArticle");
+Route::post('/addArticle', [ArticleController::class, 'addArticle'])
+    ->middleware(['auth', 'isAdmin'])->name("postAddArticle");
+Route::get('/viewArticle/{id}', [ArticleController::class, 'viewArticle'])
+    ->name("viewArticle");
+Route::get('/editArticle/{id}', [ArticleController::class, 'getEditArticle'])
+    ->middleware(['auth', 'isAdmin'])->name("getEditArticle");
+Route::post('/editArticle/{id}', [ArticleController::class, 'editArticle'])
+    ->middleware(['auth', 'isAdmin'])->name("postEditArticle");
+Route::get('/subscribe/{id}', [ArticleController::class, 'subscribe'])
+    ->middleware(['auth'])->name('subscribe');
+Route::get('/unsubscribe/{id}', [ArticleController::class, 'unsubscribe'])
+    ->middleware(['auth'])->name('unsubscribe');
+Route::get('/deleteArticle/{id}', [ArticleController::class, 'deleteArticle'])
+    ->middleware(['auth', 'isAdmin'])->name("deleteArticle");

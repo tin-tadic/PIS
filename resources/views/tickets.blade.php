@@ -1,14 +1,10 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-</head>
-<body>
-    <section class="hero is-dark is-fullheight">
+@extends('layouts.app')
+
+@section('pageTitle', 'Katalog')
+
+@section('content')
+<div>
+    <section class="hero is-light is-fullheight">
       <div class="hero-body">   
        <div class="container">
           <div class="columns is-variable is-8 is-centered">
@@ -25,46 +21,50 @@
                 </ul>
               </div>
               <div class="px-2" id="tab-content">
-                <div id="product-details">
-                  <h3 class="is-size-5 title">Nove poruke</h3>
-                  <div class="field has-background-dark">
-                    <p class="has-icons-right">
-                      <span class="is-pulled-left">
-                          Od:
-                          <a class="mr-5">Jozo</a>
-                          Naslov:
-                          <a class="">Pitanje za produkt</a>
-                      </span>
-                    
-                    <span class="icon is-small is-right is-pulled-right">
-                        <i class="fas fa-check mr-1"></i>
-                    <span class="icon is-small is-right is-pulled-right">
-                        <i class="fas fa-window-close"></i>
-                     </p>
+                <br/>
+                  <div id="product-details">
+                    @foreach ($unprocessedTickets as $unprocessedTicket)
+                    <div class="field has-background-dark">
+                      <p class="has-icons-right">
+                        <span class="is-pulled-left">
+                            <b>Od: </b>
+                            <a class="">{{ $unprocessedTicket->name . " " . $unprocessedTicket->lastname }}</a>
+                            <b>Naslov: </b>
+                            <a class="" target="_blank" href="{{ route('getGetTicketInfo', $unprocessedTicket->id) }}">{{ $unprocessedTicket->title }}</a>
+                        </span>
+                      
+                      <span class="icon is-small is-right is-pulled-right">
+                          <a href="{{ route('postSetTicketSolved', $unprocessedTicket->id) }}"><i class="fas fa-check mr-1"></i></a>
+                      </p>
+                  </div>
+                  <br />
+                  <br />
+                  @endforeach
                 </div>
 
-                <br/>
-                <br/>
 
-                </div>
+                
                 <div id="delivery-information" class="is-hidden">
-                  <h3 class="is-size-5 title">Stare poruke</h3>
+                  @foreach ($processedTickets as $processedTicket)
                   <div class="field has-background-dark">
                     <p class="has-icons-right">
                       <span class="is-pulled-left">
-                          Od:
-                          <a class="mr-5">Ivana</a>
-                          Naslov:
-                          <a class="">Problem s kuponom</a>
+                        <b>Od: </b>
+                        <a class="">{{ $processedTicket->name . " " . $processedTicket->lastname }}</a>
+                        <b>Naslov: </b>
+                        <a class="" target="_blank" href="{{ route('getGetTicketInfo', $processedTicket->id) }}">{{ $processedTicket->title }}</a>
                       </span>
                     
                     <span class="icon is-small is-right is-pulled-right">
-                        <i class="fas fa-trash mr-1"></i>
+                      <a href="{{ route('postSetTicketTrashed', $processedTicket->id) }}"><i class="fas fa-trash mr-1"></i></a>
                      </p>
                 </div>
+                <br/>
+                <br/>
+                @endforeach
+                
 
-                <br/>
-                <br/>
+
 
                 </div>
               </div>
@@ -75,8 +75,8 @@
        </div>    
       </section>
     
-</body>
-</html>
+</div>
+
 
 <style>
     .section{
@@ -106,3 +106,5 @@ tabs.forEach(tab => {
   })
 })
 </script>
+
+@endsection

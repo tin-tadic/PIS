@@ -2,69 +2,115 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\article;
-use App\Models\subscription;
+use App\Models\Article;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Auth;
+use Validator;
+use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
-    public function getArticles() {
-        return article::all();
+
+    public function getAddArticle() {
+        return view("article-add");
     }
 
     public function addArticle(Request $request) {
+        $rules = [
+            'title' => ['required', 'min:2'],
+            'description' => ['required','min:2', 'max:50'],
+            'price' => ['min:0', 'numeric'],
+            'more_info' => ['required', 'min:10'],
+            'picture' => ['required'],
+        ];
+        $messages = [
+            'title.required' => 'Naslov je obavezan',
+            'title.min' => 'Naslov je prekratak',
 
-        $request->validate([
-            'title' => ['required', 'string', 'min: 5', 'max: 30'],
-            'description' => ['required', 'string', 'min: 5', 'max: 30'],
-            'price' => ['required', 'min: 0'],
-            'more_info' => ['required', 'string', 'min: 10', 'max: 250'],
-        ]);
+            'description.required' => 'Kartki opis je obavezan',
+            'description.min' => 'Kratki opis je prekratak',
+            'description.max' => 'Kratki opis je predug',
 
-        //Fetch the image name
-        $name = $request->photo->getClientOriginalName();
-        article::create([
+            'price.numeric' => 'Cijena mora biti pozitivan broj',
+            'price.min' => 'Cijena mora biti pozitivan broj',
+
+            'more_info.required' => 'Detaljni opis je obavezan',
+            'more_info.min' => 'Detaljni opis mora biti duži od 10 znakova',
+
+            'picture.required' => 'Slika je obavezna',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
+        $name = auth()->user()->id . '-' . Str::random(15) . '-' . $request->picture->getClientOriginalName();
+        $request->picture->storeAs('articlePictures', $name, 'public');
+        $article = Article::create([
             'title' => $request->title,
             'description' => $request->description,
             'price' => $request->price,
             'more_info' => $request->more_info,
-            'created_by' => $request->created_by,
+            'created_by' => Auth::user()->id,
             'picture' => $name,
         ]);
 
-        $request->photo->storeAs('articles', $name, 'public');
+        return redirect()->route("viewArticle", $article->id);
     }
 
     public function viewArticle($id) {
         if (DB::table('articles')->where('id', $id)->exists()) {
-            $article = DB::table('articles')->where('id', $id)->get();
+            $article = DB::table('articles')->where('id', $id)->first();
             return view('article-view')->with("article", $article);
         } else {
-            dd("nema");
+            return view("not-found");
         }
     }
 
     public function getEditArticle($id) {
         if (DB::table('articles')->where('id', $id)->exists()) {
-            $article = DB::table('articles')->where('id', $id)->get();
+            $article = DB::table('articles')->where('id', $id)->first();
             return view('article-edit')->with("article", $article);
         } else {
-            dd("nema");
+            return view("not-found");
         }
     }
 
     public function editArticle(Request $request, $id) {
-        //First validate the textual components
-        $request->validate([
-            'title' => ['required', 'string', 'min: 5', 'max: 30'],
-            'description' => ['required', 'string', 'min: 5', 'max: 30'],
-            'price' => ['required', 'min: 0'],
-            'more_info' => ['required', 'string', 'min: 10', 'max: 250'],
-        ]);
+        $rules = [
+            'title' => ['required', 'min:2'],
+            'description' => ['required','min:2', 'max:50'],
+            'price' => ['min:0', 'numeric'],
+            'more_info' => ['required', 'min:10'],
+        ];
+        $messages = [
+            'title.required' => 'Naslov je obavezan',
+            'title.min' => 'Naslov je prekratak',
+
+            'description.required' => 'Kartki opis je obavezan',
+            'description.min' => 'Kratki opis je prekratak',
+            'description.max' => 'Kratki opis je predug',
+
+            'price.numeric' => 'Cijena mora biti pozitivan broj',
+            'price.min' => 'Cijena mora biti pozitivan broj',
+
+            'more_info.required' => 'Detaljni opis je obavezan',
+            'more_info.min' => 'Detaljni opis mora biti duži od 10 znakova',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+
 
         //Check if there is a new image. If no, just save changes. If yes, update it.
-        if ($request->newImage == 0) {
+        if ($request->picture == NULL) {
             DB::table('articles')->where('id', $id)->update([
                 'title' => $request->title,
                 'description' => $request->description,
@@ -72,10 +118,8 @@ class ArticleController extends Controller
                 'more_info' => $request->more_info,
             ]);
         } else {
-            //Fetch the new picture's name, but KEEP the old one in storage!
-            $name = $request->photo->getClientOriginalName();
-            $request->photo->storeAs('articles', $name, 'public');
-
+            $name = auth()->user()->id . '-' . Str::random(15) . '-' . $request->picture->getClientOriginalName();
+            $request->picture->storeAs('articlePictures', $name, 'public');
             DB::table('articles')->where('id', $id)->update([
                 'title' => $request->title,
                 'description' => $request->description,
@@ -84,28 +128,24 @@ class ArticleController extends Controller
                 'picture' => $name,
             ]);
         }
+
+        return redirect()->route("viewArticle", $id);
     }
 
-    //Checks if the user is subscribed to the currently displayed article
-    public function isSubscribed(Request $request, $id) {
-        if( DB::table('subscriptions')->where( [ ['subscribed_user', '=', $request->userId], ['subscribed_article', '=', $id] ] )->exists() ) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    public function subscribe(Request $request, $id) {
-        subscription::create([
-            'subscribed_user' => $request->userId,
+    public function subscribe($id) {
+        Subscription::create([
+            'subscribed_user' => Auth::user()->id,
             'subscribed_article' => $id,
         ]);
+
+        return redirect()->back();
     }
 
-    public function unsubscribe(Request $request, $id) {
+    public function unsubscribe($id) {
         DB::table('subscriptions')
-            ->where( [ ['subscribed_user', '=', $request->userId], ['subscribed_article', '=', $id] ] )
+            ->where('subscribed_user', '=', Auth::user()->id)->where('subscribed_article', '=', $id)
             ->delete();
+        return redirect()->back();
     }
 
     public function deleteArticle($id) {
@@ -117,5 +157,7 @@ class ArticleController extends Controller
         DB::table('articles')
             ->where('id', '=', $id)
             ->delete();
+        
+            return redirect()->route("home");
     }
 }
