@@ -13,9 +13,9 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 
 //Ticket routes
 Route::get('/contact', [ContactController::class, 'getContact'])
-    ->middleware(['auth'])->name("getContact");
+    ->middleware(['auth', 'isDisabled'])->name("getContact");
 Route::post('/contact', [ContactController::class, 'contact'])
-    ->middleware(['auth'])->name("postContact");
+    ->middleware(['auth', 'isDisabled'])->name("postContact");
 Route::get('/tickets', [ContactController::class, 'getAllTickets'])
     ->middleware(['auth', 'isAdmin'])->name("getAllTickets");
 Route::get('/tickets/{id}/process', [ContactController::class, 'setTicketSolved'])
@@ -27,11 +27,11 @@ Route::get('/ticket/{id}', [ContactController::class, 'getTicketInfo'])
 
 //Profile routes
 Route::get("/editProfile/{id}", [ProfileController::class, 'getEdit'])
-    ->middleware(['auth', 'canEditProfile'])->name("getEditProfile");
+    ->middleware(['auth', 'canEditProfile', 'isDisabled'])->name("getEditProfile");
 Route::get('/profile/{id}', [ProfileController::class, 'display'])
     ->middleware(['auth'])->name("getGetProfile");
 Route::post('/editProfile/{id}', [ProfileController::class, 'saveEdit'])
-    ->middleware(['auth', 'canEditProfile'])->name("postSaveEditProfile");
+    ->middleware(['auth', 'canEditProfile', 'isDisabled'])->name("postSaveEditProfile");
 //Admin routes
 Route::get('/banUser/{id}', [ProfileController::class, 'banUser'])
     ->middleware(['auth', 'isAdmin'])->name("postBanUser");
@@ -56,8 +56,8 @@ Route::get('/editArticle/{id}', [ArticleController::class, 'getEditArticle'])
 Route::post('/editArticle/{id}', [ArticleController::class, 'editArticle'])
     ->middleware(['auth', 'isAdmin'])->name("postEditArticle");
 Route::get('/subscribe/{id}', [ArticleController::class, 'subscribe'])
-    ->middleware(['auth'])->name('subscribe');
+    ->middleware(['auth', 'isDisabled'])->name('subscribe');
 Route::get('/unsubscribe/{id}', [ArticleController::class, 'unsubscribe'])
-    ->middleware(['auth'])->name('unsubscribe');
+    ->middleware(['auth', 'isDisabled'])->name('unsubscribe');
 Route::get('/deleteArticle/{id}', [ArticleController::class, 'deleteArticle'])
     ->middleware(['auth', 'isAdmin'])->name("deleteArticle");

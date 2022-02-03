@@ -21,7 +21,7 @@ class IsDisabled
             return $next($request);
         } else {
             Auth::logout();
-            return redirect()->back()->with('error', 'Vaš račun je trenutno onesposobljen! Kontaktirajte administratora!');
+            return redirect()->back();
         }
 
     }
