@@ -105,7 +105,7 @@
                           <p class="has-icons-right">
                               <span class="is-pulled-left">
                                   Artikal:
-                                  <a class="mr-5">{{ $subscribedArticle->title }}</a>
+                                  <a href="{{ route("viewArticle", $subscribedArticle->id) }}" class="mr-5">{{ $subscribedArticle->title }}</a>
                               </span>
                             
                               @if(auth()->user()->id == $profile->id)

@@ -37,7 +37,7 @@
                               <label for="" class="label">Email</label>
                               <input class="input" type="text" name="email" value="{{ $profile->email }}">
                               @if ($errors->has('email'))
-                                <p class="">{{ $errors->first('email') }}</p>
+                                <p class="help has-text-danger">{{ $errors->first('email') }}</p>
                               @endif
                             </div>
 
@@ -45,7 +45,7 @@
                                 <label for="" class="label">Dob</label>
                                 <input class="input" type=“number” name="age" value="{{ $profile->age }}">
                                 @if ($errors->has('age'))
-                                  <p class="">{{ $errors->first('age') }}</p>
+                                  <p class="help has-text-danger">{{ $errors->first('age') }}</p>
                                 @endif
                             </div>
 
@@ -54,7 +54,7 @@
                                     <label class="label">Spol</label>
                                     <input class="input" type="text" name="gender" value="{{ $profile->gender }}">
                                     @if ($errors->has('gender'))
-                                      <p class="">{{ $errors->first('gender') }}</p>
+                                      <p class="help has-text-danger">{{ $errors->first('gender') }}</p>
                                     @endif
                                   </div>
                             </div>
@@ -63,7 +63,7 @@
                                 <label for="" class="label">Prebivalište</label>
                                 <input class="input" type="text" name="location" value="{{ $profile->location }}">
                                 @if ($errors->has('gender'))
-                                  <p class="">{{ $errors->first('location') }}</p>
+                                  <p class="help has-text-danger">{{ $errors->first('location') }}</p>
                                 @endif
                             </div>
 

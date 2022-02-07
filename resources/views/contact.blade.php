@@ -25,7 +25,7 @@
                                       </span>
                                     </p>
                                     @if ($errors->has('name'))
-                                      <p class="">{{ $errors->first('name') }}</p>
+                                      <p class="help has-text-danger">{{ $errors->first('name') }}</p>
                                     @endif
                                   </div>
                                   <div class="field">
@@ -36,7 +36,7 @@
                                       </span>
                                     </p>
                                     @if ($errors->has('lastname'))
-                                      <p class="">{{ $errors->first('lastname') }}</p>
+                                      <p class="help has-text-danger">{{ $errors->first('lastname') }}</p>
                                     @endif
                                   </div>
                                 </div>
@@ -58,7 +58,7 @@
                                         <input class="input" type="tel" placeholder="Unesite vaš broj telefona" name="phone" value="{{ old('phone') }}">
                                       </p>
                                       @if ($errors->has('phone'))
-                                        <p class="">{{ $errors->first('phone') }}</p>
+                                        <p class="help has-text-danger">{{ $errors->first('phone') }}</p>
                                       @endif
                                     </div>
                                     <p class="help">NAPOMENA: Broj telefona nije obavezan.</p>
@@ -84,7 +84,7 @@
                                         </span>
                                       </p>
                                       @if ($errors->has('email'))
-                                        <p class="">{{ $errors->first('email') }}</p>
+                                        <p class="help has-text-danger">{{ $errors->first('email') }}</p>
                                       @endif
                                     </div>
                                   </div>
@@ -103,7 +103,7 @@
                                     <div class="control">
                                       <input class="input" type="text" placeholder="Unesite naslov ovdje" name="title" value="{{ old('title') }}">
                                       @if ($errors->has('title'))
-                                        <p class="">{{ $errors->first('title') }}</p>
+                                        <p class="help has-text-danger">{{ $errors->first('title') }}</p>
                                       @endif
                                     </div>
                                   </div>
@@ -119,7 +119,7 @@
                                     <div class="control">
                                       <textarea class="textarea" placeholder="Unesite poruku ovdje" name="message"></textarea>
                                       @if ($errors->has('message'))
-                                        <p class="">{{ $errors->first('message') }}</p>
+                                        <p class="help has-text-danger">{{ $errors->first('message') }}</p>
                                       @endif
                                     </div>
                                   </div>

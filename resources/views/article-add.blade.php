@@ -16,7 +16,7 @@
                               <label for="" class="label">Naziv</label>
                               <input class="input" type="text" placeholder="Unesite ime artikla" name="title" value="{{ old('title') }}">
                                 @if ($errors->has('title'))
-                                  <p class="">{{ $errors->first('title') }}</p>
+                                  <p class="help has-text-danger">{{ $errors->first('title') }}</p>
                                 @endif
                             </div>
 
@@ -25,7 +25,7 @@
                                 <label for="" class="label">Cijena</label>
                                 <input class="input" type="number" placeholder="Unesite cijenu" name="price" value="{{ old('price') }}">
                                 @if ($errors->has('price'))
-                                  <p class="">{{ $errors->first('price') }}</p>
+                                  <p class="help has-text-danger">{{ $errors->first('price') }}</p>
                                 @endif
                             </div>
 
@@ -33,7 +33,7 @@
                                 <label for="" class="label">Kratki opis</label>
                                 <input class="input" type="text" placeholder="Unesite kratki opis" name="description" value="{{ old('description') }}">
                                 @if ($errors->has('description'))
-                                  <p class="">{{ $errors->first('description') }}</p>
+                                  <p class="help has-text-danger">{{ $errors->first('description') }}</p>
                                 @endif
                             </div>
 
@@ -42,7 +42,7 @@
                                 <div class="control">
                                     <textarea class="textarea" placeholder="Unesite detaljni opis" name="more_info"></textarea>
                                     @if ($errors->has('more_info'))
-                                      <p class="">{{ $errors->first('more_info') }}</p>
+                                      <p class="help has-text-danger">{{ $errors->first('more_info') }}</p>
                                     @endif
                                   </div>
                             </div>
@@ -63,7 +63,7 @@
                                     </div>
                                       <br />
                                         @if ($errors->has('picture'))
-                                          <p class="">{{ $errors->first('picture') }}</p>
+                                          <p class="help has-text-danger">{{ $errors->first('picture') }}</p>
                                       @endif
 
 

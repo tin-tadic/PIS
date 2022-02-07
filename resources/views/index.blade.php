@@ -56,11 +56,6 @@
           <br>
           <br>
 
-          <div class="control mb-1">
-            <label class="checkbox">
-              <input type="checkbox">Sakrij out-of-stock artikle
-            </label>
-          </div>
 
           @if(auth()->user() && auth()->user()->role >= 1)
             <div class="field">
@@ -92,7 +87,7 @@
                   <img src="/storage/articlePictures/{{ $article->picture }}" alt="article_image"/>
                 </div>
                 <div class="card-content">
-                  <p class="has-text-centered">{{ $article->price }}</p>
+                  <p class="has-text-centered">{{ $article->price }} KM</p>
                   <p class="title is-size-5 has-text-centered">{{ $article->title }}</p>
                 </div>
                 <footer class="card-footer">

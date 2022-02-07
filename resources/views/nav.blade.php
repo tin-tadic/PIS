@@ -3,8 +3,8 @@
         <div class="navbar-start">
          <div class="navbar-item">
                 <div class="buttons">
+                    <a class="button is-light" href="{{ route("home") }}">Naslovna</a>
                     @auth
-                        <a class="button is-light" href="{{ route("home") }}">Naslovna</a>
                         <a class="button is-light" href="{{ route("getContact") }}">Kontakt</a>
 
                         @if (auth()->user() && auth()->user()->role >= 1)
