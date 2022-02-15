@@ -69,7 +69,7 @@
                                     Izbriši artikl
                                   </a>
                                   <a href="{{ route("getEditArticle", $article->id) }}" class="button mr-1 is-info is-pulled-right">
-                                    Uredi artikl~
+                                    Uredi artikl
                                   </a>
                                   @endif
                                 </p>

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\HomeController;
 
 
 Auth::routes(['reset' => false]);
@@ -61,3 +62,5 @@ Route::get('/unsubscribe/{id}', [ArticleController::class, 'unsubscribe'])
     ->middleware(['auth', 'isDisabled'])->name('unsubscribe');
 Route::get('/deleteArticle/{id}', [ArticleController::class, 'deleteArticle'])
     ->middleware(['auth', 'isAdmin'])->name("deleteArticle");
+Route::get('/search', [HomeController::class, 'search'])
+    ->name('search');
