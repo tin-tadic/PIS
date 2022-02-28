@@ -28,44 +28,22 @@
             <br/>
 
             <div class="dropdown">
-              <div class="dropdown-trigger">
-                <button type="button" class="button" aria-haspopup="true" aria-controls="dropdown-menu" >
-                  <span>Sortiranje po:</span>
-                  <span class="icon is-small">
-                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                  </span>
-                </button>
-              </div>
-              <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                <div class="dropdown-content">
-                  <a href="#" class="dropdown-item">
-                    Cijena-Najniža
-                  </a>
-                  <a class="dropdown-item">
-                    Cijena-Najviša
-                  </a>
-                  <a href="#" class="dropdown-item">
-                    Naziv-Uzlazno
-                  </a>
-                  <a href="#" class="dropdown-item">
-                    Naziv-Silazno
-                  </a>
-
-                </div>
-              </div>
-            </div>
+            <select class="dropdown" name="sortBy">
+              <option value="priceAsc">Cijena-Najniža</option>
+              <option value="priceDesc">Cijena-Najviša</option>
+              <option value="titleDesc">Naziv-Uzlazno</option>
+              <option value="titleAsc">Naziv-Silazno</option>
+            </select>
           </form>
-          
-          <br>
-          <br>
-
-
+        </div>
           @if(auth()->user() && auth()->user()->role >= 1)
             <div class="field">
               <p class="control">
-                <button class="button is-info is-fullwidth">
-                  <a href="{{ route("getAddArticle") }}">Dodaj Artikal</a>
-                </button>
+                <a href="{{ route("getAddArticle") }}" style="color: white">
+                  <button class="button is-info is-fullwidth">
+                    Dodaj Artikal
+                  </button>
+              </a>
               </p>
             </div>
           @endif
@@ -83,7 +61,9 @@
           <div class="mt-5 columns is-multiline is-centered is-8 is-variable">
           
             @if (sizeof($articles) == 0)
-              <h1>Nema artikala koji odgovaraju tim rezultatima pretrage</h1>
+              <div style="font-size: 30px">
+              <p>Nema artikala koji odgovaraju tim rezultatima pretrage</p>
+            </div>
             @endif
 
             @foreach($articles as $article)
