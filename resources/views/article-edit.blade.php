@@ -68,7 +68,7 @@
 
                             <div class="field ">
                                 <label for="" class="label">Kratki opis</label>
-                                <input class="input" type="text" placeholder="Unesite  kratki opis" name="description" value="{{ $article->title }}">
+                                <input class="input" type="text" placeholder="Unesite  kratki opis" name="description" value="{{ $article->description }}">
                                 @if ($errors->has('description'))
                                   <p class="">{{ $errors->first('description') }}</p>
                                 @endif
