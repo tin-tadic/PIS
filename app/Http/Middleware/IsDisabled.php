@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Auth;
 
 class IsDisabled
 {
@@ -17,7 +18,7 @@ class IsDisabled
     public function handle(Request $request, Closure $next)
     {
 
-        if(auth()->user()->disabled == 0) {
+        if(auth()->user()->isBanned == 0) {
             return $next($request);
         } else {
             Auth::logout();
